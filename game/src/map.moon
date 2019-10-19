@@ -102,6 +102,8 @@ postfix = ->
         for y = 0, height
             if map[x][y] == 0 and (count_neighbors x, y, 1) > 0
                 map[x][y] = 2
+                game.spawn "block", x * square, y * square
+
                 continue
 
 map_generator.load = ->
@@ -120,6 +122,14 @@ map_generator.load = ->
 
     mapgen!
     postfix!
+
+    for x = 0, width
+        for y = 0, height
+            switch map[x][y]
+                when 1
+                    game.spawn "floor", x * square, y * square
+
+    game.spawn "player", playerx * 20, playery * 20
 
 map_generator.draw = ->
     for x = 0, width
@@ -142,7 +152,6 @@ map_generator.draw = ->
                         a = 2
                         .setColor 107 / a / 255, 74 / a / 255, 22 / a / 255
                         .rectangle "fill", x * square, y * square, square, square
-
                     when 1
                         continue
 

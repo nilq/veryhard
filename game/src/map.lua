@@ -121,6 +121,7 @@ postfix = function()
       repeat
         if map[x][y] == 0 and (count_neighbors(x, y, 1)) > 0 then
           map[x][y] = 2
+          game.spawn("block", x * square, y * square)
           _continue_0 = true
           break
         end
@@ -145,7 +146,16 @@ map_generator.load = function()
     map[x] = row
   end
   mapgen()
-  return postfix()
+  postfix()
+  for x = 0, width do
+    for y = 0, height do
+      local _exp_0 = map[x][y]
+      if 1 == _exp_0 then
+        game.spawn("floor", x * square, y * square)
+      end
+    end
+  end
+  return game.spawn("player", playerx * 20, playery * 20)
 end
 map_generator.draw = function()
   for x = 0, width do

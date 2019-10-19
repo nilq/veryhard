@@ -1,4 +1,7 @@
 local state = require('src')
+math.lerp = function(a, b, t)
+  return (1 - t) * a + t * b
+end
 love.load = function()
   return state.load()
 end
