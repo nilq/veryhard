@@ -3,10 +3,14 @@ make = function(x, y)
   local player = {
     x = x,
     y = y,
+    w = 16,
+    h = 16,
+    direction = 1,
     dx = 0,
     dy = 0,
     speed = 20,
-    friction = 5
+    friction = 5,
+    weapon = { }
   }
   player.input = function(self, dt)
     local dx, dy = 0, 0
@@ -28,6 +32,9 @@ make = function(x, y)
       self.dx = self.dx + (dx * self.speed * dt)
       self.dy = self.dy + (dy * self.speed * dt)
     end
+    if not (0 == math.sign(self.dx)) then
+      self.direction = -math.sign(self.dx)
+    end
   end
   player.update = function(self, dt)
     self:input(dt)
@@ -48,22 +55,73 @@ make = function(x, y)
       local _with_0 = game.camera
       _with_0.x = math.lerp(_with_0.x, self.x - love.graphics.getWidth() / 2 / game.camera.sx, dt * 5)
       _with_0.y = math.lerp(_with_0.y, self.y - love.graphics.getHeight() / 2 / game.camera.sy, dt * 5)
-      return _with_0
     end
+    do
+      local _with_0 = light_world
+      _with_0.l = math.lerp(_with_0.l, -self.x * 5 + love.graphics.getWidth() / 2, dt * 5)
+      _with_0.t = math.lerp(_with_0.t, -self.y * 5 + love.graphics.getHeight() / 2, dt * 5)
+      _with_0.s = 5
+    end
+    if self.weapon.left then
+      self.weapon.left:update(dt)
+    end
+    if self.weapon.right then
+      self.weapon.right:update(dt)
+    end
+    return light_player:setPosition(self.x + self.w / 2, self.y + self.h / 2)
   end
   player.draw = function(self)
+    if self.weapon.right.flip == 1 then
+      if self.weapon.right then
+        self.weapon.right:draw()
+      end
+    else
+      if self.weapon.left then
+        self.weapon.left:draw()
+      end
+    end
     do
       local _with_0 = love.graphics
-      _with_0.setColor(1, 1, 0)
-      _with_0.rectangle("fill", self.x, self.y, 12, 12)
-      local mouse_x = (game.camera.x + love.mouse.getX() / game.camera.sx)
-      local mouse_y = (game.camera.y + love.mouse.getY() / game.camera.sy)
-      _with_0.setColor(1, 0, 0)
-      _with_0.line(mouse_x, mouse_y, self.x, self.y)
-      return _with_0
+      _with_0.setColor(1, 1, 1)
+      local w = sprites.player:getWidth()
+      local h = sprites.player:getHeight()
+      _with_0.draw(sprites.player, self.x + self.w / 2, self.y + self.h / 2, 0, self.weapon.right.flip * self.w / w, self.h / h, w / 2, h / 2)
+    end
+    if self.weapon.right.flip == -1 then
+      if self.weapon.right then
+        return self.weapon.right:draw()
+      end
+    else
+      if self.weapon.left then
+        return self.weapon.left:draw()
+      end
     end
   end
-  world:add(player, x, y, 12, 12)
+  player.weapon_pos_right = function(self)
+    if self.weapon.right.flip == 1 then
+      return self.x + self.w / 5, self.y + self.h / 1.35
+    else
+      return self.x + self.w / 2, self.y + self.h / 1.25
+    end
+  end
+  player.weapon_pos_left = function(self)
+    if self.weapon.left.flip == -1 then
+      return self.x + self.w / 1.6, self.y + self.h / 1.45
+    else
+      return self.x + self.w / 2, self.y + self.h / 1.25
+    end
+  end
+  player.mousepressed = function(self, x, y, button)
+    if self.weapon.left then
+      self.weapon.left:mousepressed(x, y, button)
+    end
+    if self.weapon.right then
+      return self.weapon.right:mousepressed(x, y, button)
+    end
+  end
+  world:add(player, x, y, player.w, player.h)
+  player.weapon.right = weapons.gun.make(player, "regular", true)
+  player.weapon.left = weapons.gun.make(player, "regular", false)
   return player
 end
 return {

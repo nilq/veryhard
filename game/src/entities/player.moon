@@ -2,10 +2,14 @@ make = (x, y) ->
     player = {
         :x
         :y
+        w: 16
+        h: 16
+        direction: 1,
         dx: 0
         dy: 0,
         speed: 20
         friction: 5
+        weapon: {}
     }
 
     player.input = (dt) =>
@@ -30,6 +34,8 @@ make = (x, y) ->
             @dx += dx * @speed * dt
             @dy += dy * @speed * dt
 
+        @direction = -math.sign @dx unless 0 == math.sign @dx
+
     player.update = (dt) =>
         @input dt
 
@@ -48,18 +54,59 @@ make = (x, y) ->
             .x = math.lerp .x, @x - love.graphics.getWidth! / 2 / game.camera.sx, dt * 5
             .y = math.lerp .y, @y - love.graphics.getHeight! / 2 / game.camera.sy, dt * 5
 
+            -- light_world\setTranslation -@x * 5 + love.graphics.getWidth! / 2, -@y * 5 + love.graphics.getHeight! / 2, 5
+
+        with light_world
+            .l = math.lerp .l, -@x * 5 + love.graphics.getWidth! / 2, dt * 5
+            .t = math.lerp .t, -@y * 5 + love.graphics.getHeight! / 2, dt * 5
+            .s = 5
+
+
+
+        @weapon.left\update dt if @weapon.left
+        @weapon.right\update dt if @weapon.right
+
+        light_player\setPosition @x + @w / 2, @y + @h / 2
+
     player.draw = =>
+        if @weapon.right.flip == 1
+            @weapon.right\draw! if @weapon.right
+        else
+            @weapon.left\draw! if @weapon.left
+
         with love.graphics
-            .setColor 1, 1, 0
-            .rectangle "fill", @x, @y, 12, 12
+            .setColor 1, 1, 1
+            w = sprites.player\getWidth!
+            h = sprites.player\getHeight!
 
-            mouse_x = (game.camera.x + love.mouse.getX! / game.camera.sx)
-            mouse_y = (game.camera.y + love.mouse.getY! / game.camera.sy)
+            .draw sprites.player, @x + @w / 2, @y + @h / 2, 0, @weapon.right.flip * @w / w, @h / h, w / 2, h / 2
 
-            .setColor 1, 0, 0
-            .line mouse_x, mouse_y, @x, @y
+        if @weapon.right.flip == -1
+            @weapon.right\draw! if @weapon.right
+        else
+            @weapon.left\draw! if @weapon.left
 
-    world\add player, x, y, 12, 12    
+    player.weapon_pos_right = =>
+        if @weapon.right.flip == 1
+            @x + @w / 5, @y + @h / 1.35
+        else
+            @x + @w / 2, @y + @h / 1.25
+
+    player.weapon_pos_left = =>
+        if @weapon.left.flip == -1
+            @x + @w / 1.6, @y + @h / 1.45
+        else
+            @x + @w / 2, @y + @h / 1.25
+
+    player.mousepressed = (x, y, button) =>
+        @weapon.left\mousepressed x, y, button  if @weapon.left
+        @weapon.right\mousepressed x, y, button if @weapon.right
+
+
+    world\add player, x, y, player.w, player.h
+    player.weapon.right = weapons.gun.make player, "regular", true
+    player.weapon.left  = weapons.gun.make player, "regular", false
+
 
     player
 
