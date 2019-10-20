@@ -2,11 +2,11 @@ map_generator = {}
 
 map = {}
 
-square = 20
+square = 24
 width  = love.graphics.getWidth! / square
 height = love.graphics.getHeight! / square - 1
 
-love.graphics.setBackgroundColor 189 / 255, 135 / 255, 49 / 255
+love.graphics.setBackgroundColor 107 / 255, 74 / 255, 22 / 255
 
 -- settings
 turn_prop = 0.3
@@ -109,7 +109,7 @@ postfix = ->
 map_generator.load = ->
     steps = start_steps
 
-    math.randomseed os.time!
+    math.randomseed os.clock()
 
     map = {}
     player_set = false
@@ -129,7 +129,7 @@ map_generator.load = ->
                 when 1
                     game.spawn "floor", x * square, y * square
 
-    game.spawn "player", playerx * 20, playery * 20
+    game.spawn "player", playerx * square, playery * square
 
 map_generator.draw = ->
     for x = 0, width

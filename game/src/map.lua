@@ -1,9 +1,9 @@
 local map_generator = { }
 local map = { }
-local square = 20
+local square = 24
 local width = love.graphics.getWidth() / square
 local height = love.graphics.getHeight() / square - 1
-love.graphics.setBackgroundColor(189 / 255, 135 / 255, 49 / 255)
+love.graphics.setBackgroundColor(107 / 255, 74 / 255, 22 / 255)
 local turn_prop = 0.3
 local worm_prop = 0.1
 local player_set = false
@@ -135,7 +135,7 @@ postfix = function()
 end
 map_generator.load = function()
   steps = start_steps
-  math.randomseed(os.time())
+  math.randomseed(os.clock())
   map = { }
   player_set = false
   for x = 0, width do
@@ -155,7 +155,7 @@ map_generator.load = function()
       end
     end
   end
-  return game.spawn("player", playerx * 20, playery * 20)
+  return game.spawn("player", playerx * square, playery * square)
 end
 map_generator.draw = function()
   for x = 0, width do

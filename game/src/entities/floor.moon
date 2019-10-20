@@ -3,8 +3,8 @@ make = (x, y) ->
 
     floor.draw = ->
         with love.graphics
-            .setColor 107 / 255, 74 / 255, 22 / 255
-            .rectangle "fill", x, y, 20, 20
+            .setColor 189 / 255, 135 / 255, 49 / 255
+            .rectangle "fill", x, y, 24, 24
 
     floor
 

@@ -5,8 +5,11 @@ export game = {
 
 map = require "src/map"
 bump = require "libs/bump"
+camera = require "libs/camera"
 
 game.spawn = (k, x, y) ->
+    game.camera = camera 0, 0, 3, 3, 0
+
     entities    = require "src/entities"
     entity_make = entities[k].make
 
@@ -28,8 +31,12 @@ game.draw = ->
     if game.map_view
         map.draw!
     else
+        game.camera\set!
+
         for entity in *game.objects
             entity\draw! if entity.draw
+
+        game.camera\unset!
 
 game.keypressed = (key) ->
     if game.map_view

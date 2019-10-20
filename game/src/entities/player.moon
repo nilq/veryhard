@@ -4,8 +4,8 @@ make = (x, y) ->
         :y
         dx: 0
         dy: 0,
-        speed: 30
-        friction: 4
+        speed: 20
+        friction: 5
     }
 
     player.input = (dt) =>
@@ -44,12 +44,22 @@ make = (x, y) ->
         @dx = math.lerp @dx, 0, dt * @friction
         @dy = math.lerp @dy, 0, dt * @friction
 
+        with game.camera
+            .x = math.lerp .x, @x - love.graphics.getWidth! / 2 / game.camera.sx, dt * 5
+            .y = math.lerp .y, @y - love.graphics.getHeight! / 2 / game.camera.sy, dt * 5
+
     player.draw = =>
         with love.graphics
             .setColor 1, 1, 0
-            .rectangle "fill", @x, @y, 16, 16
+            .rectangle "fill", @x, @y, 12, 12
 
-    world\add player, x, y, 16, 16    
+            mouse_x = (game.camera.x + love.mouse.getX! / game.camera.sx)
+            mouse_y = (game.camera.y + love.mouse.getY! / game.camera.sy)
+
+            .setColor 1, 0, 0
+            .line mouse_x, mouse_y, @x, @y
+
+    world\add player, x, y, 12, 12    
 
     player
 

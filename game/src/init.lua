@@ -4,7 +4,9 @@ game = {
 }
 local map = require("src/map")
 local bump = require("libs/bump")
+local camera = require("libs/camera")
 game.spawn = function(k, x, y)
+  game.camera = camera(0, 0, 3, 3, 0)
   local entities = require("src/entities")
   local entity_make = entities[k].make
   local entity = entity_make(x, y)
@@ -31,6 +33,7 @@ game.draw = function()
   if game.map_view then
     return map.draw()
   else
+    game.camera:set()
     local _list_0 = game.objects
     for _index_0 = 1, #_list_0 do
       local entity = _list_0[_index_0]
@@ -38,6 +41,7 @@ game.draw = function()
         entity:draw()
       end
     end
+    return game.camera:unset()
   end
 end
 game.keypressed = function(key)
