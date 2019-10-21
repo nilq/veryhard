@@ -24,6 +24,9 @@ make = (parent, name, right) ->
     gun.update = (dt, x, y) =>
         @rotation = math.atan2 (@y + @h / 2) - y, (@x + @w / 2) - x
 
+        if @shoot_timer > 0
+            @rotation += @flip * (1 - @shoot_timer * dt) / 2
+
         a = -math.sign x - @x
 
         if a != 0 if 10 < math.abs x - @x 
@@ -35,17 +38,20 @@ make = (parent, name, right) ->
             @x, @y = @parent\weapon_pos_left!
 
         @x -= @radius * math.cos @rotation
-        @y -= @radius * math.sin @rotation
+        
+        sin = math.sin @rotation
+        a   = 1
+        if sin > 0
+            a = 1.5
+
+        @y -= @radius * a * sin
 
         @shoot_timer -= dt if @shoot_timer > 0
 
     gun.shoot = (x, y) =>
         if @shoot_timer <= 0
-            @shoot_timer = 0.3
-
-            bullet = game.spawn "bullet", @x, @y
-            bullet.angle = math.atan2 y - (@y + @h / 2), x - (@x + @w / 2)
-
+            @shoot_timer = 0.4
+            game.spawn_bullet @x - (@w * math.cos @rotation), @y - (@w * math.sin @rotation), math.atan2 y - (@y + @h / 2), x - (@x + @w / 2)
 
     gun
 

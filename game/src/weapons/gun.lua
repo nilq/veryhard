@@ -25,6 +25,9 @@ make = function(parent, name, right)
   end
   gun.update = function(self, dt, x, y)
     self.rotation = math.atan2((self.y + self.h / 2) - y, (self.x + self.w / 2) - x)
+    if self.shoot_timer > 0 then
+      self.rotation = self.rotation + (self.flip * (1 - self.shoot_timer * dt) / 2)
+    end
     local a = -math.sign(x - self.x)
     if a ~= 0 then
       if 10 < math.abs(x - self.x) then
@@ -37,16 +40,20 @@ make = function(parent, name, right)
       self.x, self.y = self.parent:weapon_pos_left()
     end
     self.x = self.x - (self.radius * math.cos(self.rotation))
-    self.y = self.y - (self.radius * math.sin(self.rotation))
+    local sin = math.sin(self.rotation)
+    a = 1
+    if sin > 0 then
+      a = 1.5
+    end
+    self.y = self.y - (self.radius * a * sin)
     if self.shoot_timer > 0 then
       self.shoot_timer = self.shoot_timer - dt
     end
   end
   gun.shoot = function(self, x, y)
     if self.shoot_timer <= 0 then
-      self.shoot_timer = 0.3
-      local bullet = game.spawn("bullet", self.x, self.y)
-      bullet.angle = math.atan2(y - (self.y + self.h / 2), x - (self.x + self.w / 2))
+      self.shoot_timer = 0.4
+      return game.spawn_bullet(self.x - (self.w * math.cos(self.rotation)), self.y - (self.w * math.sin(self.rotation)), math.atan2(y - (self.y + self.h / 2), x - (self.x + self.w / 2)))
     end
   end
   return gun

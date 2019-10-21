@@ -17,7 +17,10 @@ with love.graphics
         rock: image "tiles/rock.png", true
 
         enemies:
-            tony: image "enemies/tony.png"
+            tony:
+                normal: image "enemies/tony.png"
+                shot:   image "enemies/tony_shot.png"
+                dead:   image "enemies/tony_dead.png"
 
         normals:
             rock: image "rock_normalmap.png"

@@ -2,6 +2,7 @@ make = (x, y) ->
     block = {
         :x
         :y
+        tag: "block"
     }
 
     block.draw = =>

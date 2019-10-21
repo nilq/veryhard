@@ -10,7 +10,8 @@ make = function(x, y)
     dy = 0,
     speed = 20,
     friction = 5,
-    weapon = { }
+    weapon = { },
+    tag = "player"
   }
   player.input = function(self, dt)
     local dx, dy = 0, 0
@@ -124,7 +125,7 @@ make = function(x, y)
         return self.weapon.right:shoot(mouse_x, mouse_y)
       end
     elseif button == 2 then
-      return game.spawn("enemy", self.x, self.y)
+      return game.spawn("enemy", self.x, self.y, "tony")
     end
   end
   world:add(player, x, y, player.w, player.h)

@@ -2,7 +2,8 @@ local make
 make = function(x, y)
   local block = {
     x = x,
-    y = y
+    y = y,
+    tag = "block"
   }
   block.draw = function(self)
     do

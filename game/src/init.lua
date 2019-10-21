@@ -1,6 +1,7 @@
 game = {
   map_view = false,
-  objects = { }
+  objects = { },
+  bullets = { }
 }
 sprites = require("src/sprites")
 weapons = require("src/weapons")
@@ -9,13 +10,17 @@ local map = require("src/map")
 local bump = require("libs/bump")
 local camera = require("libs/camera")
 local piefiller = require("libs/piefiller")
+local entities = require("src/entities")
 local pie = piefiller:new()
 local show_pie = false
-game.spawn = function(k, x, y)
-  game.camera = camera(0, 0, 1, 1, 0)
-  local entities = require("src/entities")
+game.spawn_bullet = function(x, y, angle)
+  local bullet = entities.bullet.make(x, y)
+  bullet.angle = angle
+  return table.insert(game.bullets, bullet)
+end
+game.spawn = function(k, x, y, ...)
   local entity_make = entities[k].make
-  local entity = entity_make(x, y)
+  local entity = entity_make(x, y, ...)
   table.insert(game.objects, entity)
   if entity.load then
     entity:load()
@@ -26,6 +31,7 @@ game.spawn = function(k, x, y)
   return entity
 end
 game.load = function()
+  game.camera = camera(0, 0, 1, 1, 0)
   world = bump.newWorld()
   game.objects = { }
   game.zoom = 1
@@ -53,9 +59,27 @@ game.update = function(dt)
   game.camera.sx = game.zoom
   game.camera.sy = game.zoom
   game.zoom = math.lerp(game.zoom, 3, dt / 1.5)
-  local _list_0 = game.objects
+  local _list_0 = game.bullets
   for _index_0 = 1, #_list_0 do
-    local entity = _list_0[_index_0]
+    local _continue_0 = false
+    repeat
+      local bullet = _list_0[_index_0]
+      if not (bullet) then
+        _continue_0 = true
+        break
+      end
+      if bullet.update then
+        bullet:update(dt)
+      end
+      _continue_0 = true
+    until true
+    if not _continue_0 then
+      break
+    end
+  end
+  local _list_1 = game.objects
+  for _index_0 = 1, #_list_1 do
+    local entity = _list_1[_index_0]
     if entity.update then
       entity:update(dt)
     end
@@ -76,6 +100,24 @@ game.draw = function()
         local entity = _list_0[_index_0]
         if entity.draw then
           entity:draw()
+        end
+      end
+      local _list_1 = game.bullets
+      for _index_0 = 1, #_list_1 do
+        local _continue_0 = false
+        repeat
+          local bullet = _list_1[_index_0]
+          if not (bullet) then
+            _continue_0 = true
+            break
+          end
+          if bullet.draw then
+            bullet:draw()
+          end
+          _continue_0 = true
+        until true
+        if not _continue_0 then
+          break
         end
       end
     end)

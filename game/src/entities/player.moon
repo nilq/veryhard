@@ -10,6 +10,7 @@ make = (x, y) ->
         speed: 20
         friction: 5
         weapon: {}
+        tag: "player"
     }
 
     player.input = (dt) =>
@@ -107,7 +108,7 @@ make = (x, y) ->
             @weapon.left\shoot mouse_x, mouse_y  if @weapon.left
             @weapon.right\shoot mouse_x, mouse_y if @weapon.right
         elseif button == 2
-            game.spawn "enemy", @x, @y
+            game.spawn "enemy", @x, @y, "tony"
 
 
     world\add player, x, y, player.w, player.h

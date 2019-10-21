@@ -1,28 +1,32 @@
 export game = {
     map_view: false
     objects: {}
+    bullets: {}
 }
 
 export sprites = require "src/sprites"
 export weapons = require "src/weapons"
 
-light   = require "libs/light"
-map = require "src/map"
-bump = require "libs/bump"
-camera = require "libs/camera"
+light     = require "libs/light"
+map       = require "src/map"
+bump      = require "libs/bump"
+camera    = require "libs/camera"
 piefiller = require "libs/piefiller"
+entities  = require "src/entities"
 
-pie = piefiller\new!
+pie       = piefiller\new!
+show_pie  = false
 
-show_pie = false
+game.spawn_bullet = (x, y, angle) ->
+    bullet = entities.bullet.make x, y
+    bullet.angle = angle
 
-game.spawn = (k, x, y) ->
-    game.camera = camera 0, 0, 1, 1, 0
+    table.insert game.bullets, bullet
 
-    entities    = require "src/entities"
+game.spawn = (k, x, y, ...) ->
     entity_make = entities[k].make
 
-    entity = entity_make x, y
+    entity = entity_make x, y, ...
     table.insert game.objects, entity
     entity\load! if entity.load
 
@@ -32,6 +36,8 @@ game.spawn = (k, x, y) ->
     entity
 
 game.load = ->
+    game.camera = camera 0, 0, 1, 1, 0
+
     export world = bump.newWorld!
     game.objects = {}
     game.zoom    = 1
@@ -58,6 +64,11 @@ game.update = (dt) ->
 
     game.zoom = math.lerp game.zoom, 3, dt / 1.5
 
+    for bullet in *game.bullets
+        continue unless bullet
+
+        bullet\update dt if bullet.update
+
     for entity in *game.objects
         entity\update dt if entity.update
 
@@ -73,6 +84,11 @@ game.draw = ->
             love.graphics.clear 0, 0, 0
             for entity in *game.objects
                 entity\draw! if entity.draw
+            
+            for bullet in *game.bullets
+                continue unless bullet
+
+                bullet\draw! if bullet.draw
         
     love.graphics.print love.timer.getFPS!, 10, 10
 
