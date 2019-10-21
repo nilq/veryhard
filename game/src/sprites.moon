@@ -16,7 +16,13 @@ with love.graphics
         grass: image "tiles/grass.png", true
         rock: image "tiles/rock.png", true
 
+        enemies:
+            tony: image "enemies/tony.png"
+
         normals:
             rock: image "rock_normalmap.png"
             grass: image "grass_normalmap.png"
+            player: image "man_normalmap.png"
+            enemies:
+                tony: image "tony_normalmap.png"
     }

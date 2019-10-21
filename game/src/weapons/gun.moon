@@ -19,24 +19,14 @@ make = (parent, name, right) ->
         with love.graphics
             .setColor 1, 1, 1
 
-            if @shoot_timer > 0
-                mouse_x = game.camera.x + love.mouse.getX! / game.camera.sx
-                mouse_y = game.camera.y + love.mouse.getY! / game.camera.sy
-
-
-                .line @x, @y, mouse_x, mouse_y
-
             .draw @sprite, @x, @y, @rotation, 0.8, 0.8 * @flip, @w / 2, @h / 2
 
-    gun.update = (dt) =>
-        mouse_x = game.camera.x + love.mouse.getX! / game.camera.sx
-        mouse_y = game.camera.y + love.mouse.getY! / game.camera.sy
+    gun.update = (dt, x, y) =>
+        @rotation = math.atan2 (@y + @h / 2) - y, (@x + @w / 2) - x
 
-        @rotation = math.atan2 (@y + @h / 2) - mouse_y, (@x + @w / 2) - mouse_x
+        a = -math.sign x - @x
 
-        a = -math.sign mouse_x - @x
-
-        if a != 0 if 10 < math.abs mouse_x - @x 
+        if a != 0 if 10 < math.abs x - @x 
             @flip = a
 
         if @right
@@ -49,9 +39,12 @@ make = (parent, name, right) ->
 
         @shoot_timer -= dt if @shoot_timer > 0
 
-    gun.mousepressed = (x, y, button) =>
-        if button == 1
-            @shoot_timer = 0.15
+    gun.shoot = (x, y) =>
+        if @shoot_timer <= 0
+            @shoot_timer = 0.3
+
+            bullet = game.spawn "bullet", @x, @y
+            bullet.angle = math.atan2 y - (@y + @h / 2), x - (@x + @w / 2)
 
 
     gun

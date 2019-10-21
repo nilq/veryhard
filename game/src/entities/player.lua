@@ -58,15 +58,17 @@ make = function(x, y)
     end
     do
       local _with_0 = light_world
-      _with_0.l = math.lerp(_with_0.l, -self.x * 5 + love.graphics.getWidth() / 2, dt * 5)
-      _with_0.t = math.lerp(_with_0.t, -self.y * 5 + love.graphics.getHeight() / 2, dt * 5)
-      _with_0.s = 5
+      _with_0.l = math.lerp(_with_0.l, -self.x * game.zoom + love.graphics.getWidth() / 2, dt * game.zoom)
+      _with_0.t = math.lerp(_with_0.t, -self.y * game.zoom + love.graphics.getHeight() / 2, dt * game.zoom)
+      _with_0.s = game.zoom
     end
+    local mouse_x = game.camera.x + love.mouse.getX() / game.camera.sx
+    local mouse_y = game.camera.y + love.mouse.getY() / game.camera.sy
     if self.weapon.left then
-      self.weapon.left:update(dt)
+      self.weapon.left:update(dt, mouse_x, mouse_y)
     end
     if self.weapon.right then
-      self.weapon.right:update(dt)
+      self.weapon.right:update(dt, mouse_x, mouse_y)
     end
     return light_player:setPosition(self.x + self.w / 2, self.y + self.h / 2)
   end
@@ -112,11 +114,17 @@ make = function(x, y)
     end
   end
   player.mousepressed = function(self, x, y, button)
-    if self.weapon.left then
-      self.weapon.left:mousepressed(x, y, button)
-    end
-    if self.weapon.right then
-      return self.weapon.right:mousepressed(x, y, button)
+    if button == 1 then
+      local mouse_x = game.camera.x + love.mouse.getX() / game.camera.sx
+      local mouse_y = game.camera.y + love.mouse.getY() / game.camera.sy
+      if self.weapon.left then
+        self.weapon.left:shoot(mouse_x, mouse_y)
+      end
+      if self.weapon.right then
+        return self.weapon.right:shoot(mouse_x, mouse_y)
+      end
+    elseif button == 2 then
+      return game.spawn("enemy", self.x, self.y)
     end
   end
   world:add(player, x, y, player.w, player.h)

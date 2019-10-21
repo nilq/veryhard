@@ -57,14 +57,15 @@ make = (x, y) ->
             -- light_world\setTranslation -@x * 5 + love.graphics.getWidth! / 2, -@y * 5 + love.graphics.getHeight! / 2, 5
 
         with light_world
-            .l = math.lerp .l, -@x * 5 + love.graphics.getWidth! / 2, dt * 5
-            .t = math.lerp .t, -@y * 5 + love.graphics.getHeight! / 2, dt * 5
-            .s = 5
+            .l = math.lerp .l, -@x * game.zoom + love.graphics.getWidth! / 2, dt * game.zoom
+            .t = math.lerp .t, -@y * game.zoom + love.graphics.getHeight! / 2, dt * game.zoom
+            .s = game.zoom
 
+        mouse_x = game.camera.x + love.mouse.getX! / game.camera.sx
+        mouse_y = game.camera.y + love.mouse.getY! / game.camera.sy
 
-
-        @weapon.left\update dt if @weapon.left
-        @weapon.right\update dt if @weapon.right
+        @weapon.left\update dt, mouse_x, mouse_y  if @weapon.left
+        @weapon.right\update dt, mouse_x, mouse_y if @weapon.right
 
         light_player\setPosition @x + @w / 2, @y + @h / 2
 
@@ -99,14 +100,19 @@ make = (x, y) ->
             @x + @w / 2, @y + @h / 1.25
 
     player.mousepressed = (x, y, button) =>
-        @weapon.left\mousepressed x, y, button  if @weapon.left
-        @weapon.right\mousepressed x, y, button if @weapon.right
+        if button == 1
+            mouse_x = game.camera.x + love.mouse.getX! / game.camera.sx
+            mouse_y = game.camera.y + love.mouse.getY! / game.camera.sy
+
+            @weapon.left\shoot mouse_x, mouse_y  if @weapon.left
+            @weapon.right\shoot mouse_x, mouse_y if @weapon.right
+        elseif button == 2
+            game.spawn "enemy", @x, @y
 
 
     world\add player, x, y, player.w, player.h
     player.weapon.right = weapons.gun.make player, "regular", true
     player.weapon.left  = weapons.gun.make player, "regular", false
-
 
     player
 
